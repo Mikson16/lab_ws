@@ -1,0 +1,15 @@
+# Ignorar carpetas de construcción de ROS 2
+build/
+install/
+log/
+
+# Archivos temporales y de sistema
+*.pyc
+__pycache__/
+*.swp
+*.bak
+.DS_Store
+
+# Archivos de configuración de editores
+.vscode/
+.idea/
