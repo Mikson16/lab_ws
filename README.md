@@ -1,6 +1,5 @@
 # Lab de Ros2 para Robotica Movil del grupo de Julian Alberto
 
-
 ## Forma de instalacion del workspace
 En bash 
 cd ~
@@ -38,3 +37,5 @@ Ahora para agregar el repositorio a sus computadores:
 - source install/setup.bash
 - ros2 pkg list (para revisar si les aparece el pkg lab_1_pkg)
 - Recordar siempre dar permiso a los archivos con chmod u+x nombre.py, en la carpeta de scripts 
+
+
