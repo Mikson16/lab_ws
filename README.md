@@ -29,3 +29,12 @@ Para configurar una clave ssh:
 
 
 
+Ahora para agregar el repositorio a sus computadores:
+- cd $HOME
+- git clone https://github.com/Mikson16/lab_ws.git
+- cd lab_ws
+    source /opt/ros/humble/setup.bash
+    colcon build
+- source install/setup.bash
+- ros2 pkg list (para revisar si les aparece el pkg lab_1_pkg)
+- Recordar siempre dar permiso a los archivos con chmod u+x nombre.py, en la carpeta de scripts 
