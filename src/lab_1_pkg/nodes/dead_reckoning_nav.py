@@ -3,73 +3,98 @@
 import rclpy
 from rclpy.node import Node
 # Importamos el mensaje segun el tipo que recibimos
-from geometry_msgs.msg import PoseArray
+from geometry_msgs.msg import PoseArray, Twist
 # Importamos el mensaje para leer la odometria
 from nav_msgs.msg import Odometry
 # Ocupamos euler from quaternion para convertir el mensaje enviado
 from tf_transformations import euler_from_quaternion
-
+import math
+import time
 
 class DeadReckoningNav(Node):
 
     def __init__(self):
-        super().__init__('nodito')
-        # Nos suscribimos al topico
-        self.subscription_array = self.create_subscription(
-            PoseArray,              # Tipo de mensaje
-            'goal_list',         # Nombre del tópico
-            self.listener_callback,
-            10                   # QoS
-        )
+        super().__init__('dead_reckoning_nav')
 
-        # self.subscription_odom = self.create_subscription(
-        #     Odometry,
-        #     '/odom',
-        #     self.read_odometry,
-        #     10
-        # )
+        #Suscripción a Pose_Loader
+        self.subscription_array = self.create_subscription(PoseArray,'goal_list',self.listener_callback,10)
+
+        #Suscripción a la odometría
+        self.subscription_odom = self.create_subscription(Odometry,'/odom',self.read_odometry_callback,10)
+
+        #Publicador de velocidades
+        self.publisher_cmd_vel = self.create_publisher(Twist,'/cmd_vel_mux/input/navigation',10)
+
         self.odometria_actual = ""
-        self.get_logger().info('Realizado ')
-
+        self.get_logger().info('Nodo dead_reckoning_nav iniciado.')
 
     def listener_callback(self, msg):
-        # Recibimos el mensaje del topico
-        self.get_logger().info(f'Recibido: "{msg}"')
-
+        #Recibe la lista de poses objetivo
+        self.get_logger().info(f'Recibidas {len(msg.poses)} poses.')
 
         for i, pose in enumerate(msg.poses):
-            self.get_logger().info(f"{i}")
-            pos = pose.position
-            ori = pose.orientation
-            self.get_logger().info(
-                f'Pose {i}: '
-                f'Pos(x={pos.x}, y={pos.y}, z={pos.z}), '
-                f'Ori(x={ori.x}, y={ori.y}, z={ori.z}, w={ori.w})'
-            )
-            self.get_logger().info("")
-            # Almacenamos en un array [x,y,teta]
-            #array_pose = [pos.x, pos.y, pos.w]
-            
-            # Enviamos cada a la funcion mover robot
-            #self.mover_robot_a_destino(array_pose)
+            x = pose.position.x
+            y = pose.position.y
+            q = pose.orientation
+            _, _, theta = euler_from_quaternion((q.x, q.y, q.z, q.w))
 
-    def read_odometry(self, odom ):
-        # Metodo encargado de leer la odometria 
-        # y reenviar para obtener la velocidad a enviar
-        x = odom.pose.pose.position.x
-        y = odom.pose.pose.position.y
-        z = odom.pose.pose.position.z
-        roll, pitch, yaw = euler_from_quaternion( ( odom.pose.pose.orientation.x,
-                                                                                odom.pose.pose.orientation.y,
-                                                                                odom.pose.pose.orientation.z,
-                                                                                odom.pose.pose.orientation.w ) )
-        #self.get_logger().info( 'Current pose - lin: (%f, %f, %f) ang: (%f, %f, %f)' % (x, y, z, roll, pitch, yaw) 
-        #! Probar si es que se puede retornar directamente en el otro metodo
-        return x, y, roll
+            goal = [x, y, theta]
+            self.get_logger().info(f"Moviendo al objetivo {i}: {goal}")
+            self.mover_robot_a_destino(goal)
 
-    def mover_robot_a_destino(self, array_pose):
-        pass
-        
+        self.get_logger().info("Todos los objetivos fueron alcanzados.")
+
+    def read_odometry_callback(self, odom_msg):
+        x = odom_msg.pose.pose.position.x
+        y = odom_msg.pose.pose.position.y
+        q = odom_msg.pose.pose.orientation
+        _, _, yaw = euler_from_quaternion((q.x, q.y, q.z, q.w))
+
+        self.odometria_actual = (x, y, yaw)
+
+    def mover_robot_a_destino(self, goal):
+        #Esperar hasta que tengamos odometría válida
+        while self.odometria_actual == "":
+            rclpy.spin_once(self)
+
+        x_goal, y_goal, theta_goal = goal
+
+        while rclpy.ok():
+            x, y, theta = self.odometria_actual
+
+            #Calcular distancia y ángulo al objetivo
+            dx = x_goal - x
+            dy = y_goal - y
+            distance = math.sqrt(dx**2 + dy**2)
+            angle_to_goal = math.atan2(dy, dx)
+
+            #Error angular al objetivo
+            angle_error = angle_to_goal - theta
+            angle_error = math.atan2(math.sin(angle_error), math.cos(angle_error))  # normalizado
+
+            twist = Twist()
+
+            if distance > 0.05:
+                if abs(angle_error) > 0.1:
+                    twist.angular.z = 0.5 * angle_error
+                else:
+                    twist.linear.x = 0.2
+            else:
+                #Orientación
+                final_error = theta_goal - theta
+                final_error = math.atan2(math.sin(final_error), math.cos(final_error))
+                if abs(final_error) > 0.1:
+                    twist.angular.z = 0.3 * final_error
+                else:
+                    break
+
+            self.publisher_cmd_vel.publish(twist)
+            rclpy.spin_once(self)
+            time.sleep(0.1)
+
+        #Detener el robot
+        self.publisher_cmd_vel.publish(Twist())
+        time.sleep(0.5)
 
 
 def main(args=None):
@@ -80,4 +105,4 @@ def main(args=None):
     rclpy.shutdown()
 
 if __name__ == '__main__':
-     main()
+    main()
