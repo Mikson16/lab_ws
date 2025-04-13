@@ -95,6 +95,38 @@ class DeadReckoningNav(Node):
         #Detener el robot
         self.publisher_cmd_vel.publish(Twist())
         time.sleep(0.5)
+    
+    def aplicar_velocidad(self, lista_triplets):
+        """
+        El argumento corresponde a una lista de triplets, donde cada uno contendra la velocidad lineal, angular y el tiempo de aplicacion de dichas velocidades, esta funcion no se encarga de calcular como llegar a la pose objetivo, solo aplica las velocidades en una serie de tiempo"""
+
+        twist = Twist()
+
+
+        for triplet in lista_triplets:
+            v_lineal, w_angular, tiempo = triplet
+            
+            # Aplicar velocidades lineales
+            twist.linear.x = v_lineal
+            twist.linear.y = 0.0
+            twist.linear.z = 0.0
+
+            # Aplicar velocidades angulares
+            twist.angular.x = 0.0
+            twist.angular.y = 0.0
+            twist.angular.z = w_angular
+
+            # Publicar el mensaje de velocidad
+            self.publisher_cmd_vel.publish(twist)
+            self.get_logger().info(f"Aplicando velocidades: {v_lineal}, {w_angular} durante {tiempo} segundos")
+            # Esperar el tiempo especificado
+            time.sleep(tiempo)
+        
+        # Detener el robot
+        twist.linear.x = 0.0
+        twist.angular.z = 0.0
+        self.publisher_cmd_vel.publish(twist)
+        self.get_logger().info("Robot detenido.")
 
 
 def main(args=None):
