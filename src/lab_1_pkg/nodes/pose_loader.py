@@ -32,8 +32,11 @@ class PoseLoader(Node):
         #ruta = os.path('/home/maxipis/ros2_ws/src/simulation_connection/nodes/coordenadas.txt')
 
         try:
-            # ! Areglar la ruta a relativa
-            with open('/home/maxipis/ros2_ws/src/simulation_connection/nodes/coordenadas.txt', 'r') as file:
+            #! Siempre agregar el archivo de input a la ruta <workspace>/install/lib/<package>#
+            dir_route = os.path.dirname(os.path.abspath(__file__)) #Consigue la ruta del directorio actual
+
+            coordenadas_file_path = os.path.join(dir_route, 'coordenadas.txt') #Hace join del directorio actual con el nombre del archivo
+            with open(coordenadas_file_path, 'r') as file:
                 self.get_logger().info('Lei bien el archivo')
                 for line in file:
                     x, y, theta = map(float, line.strip().split(','))
