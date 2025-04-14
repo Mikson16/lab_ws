@@ -1,0 +1,2 @@
+VELOCIDAD_LINEAL = 0.2 #[m/s]
+VELOCIDAD_ANGULAR = 1.0  #[rad/s]
