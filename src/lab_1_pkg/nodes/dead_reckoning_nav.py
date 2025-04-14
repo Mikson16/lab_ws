@@ -99,6 +99,7 @@ class DeadReckoningNav(Node):
         
         
         if True:
+            #print(self.obtener_odometria())
             x_odom, y_odom, theta_odom = self.obtener_odometria()
             # self.get_logger().info("Entre al while de la odometri")
             self.get_logger().info(f"La odometria indica {x_odom, y_odom, theta_odom}")
@@ -130,7 +131,7 @@ class DeadReckoningNav(Node):
         #Detener el robot
         #self.publisher_cmd_vel.publish(Twist())
         #time.sleep(0.5)
-    
+
     def aplicar_velocidad(self, msg_to_send):
         """
         input: [v, 0, t] o [0,w,t] 
@@ -156,8 +157,12 @@ class DeadReckoningNav(Node):
             self.publisher_cmd_vel.publish(twist)
             #self.get_logger().info(f"Aplicando velocidades: {v_lineal}, {w_angular} durante {tiempo} segundos")
         # Esperar el tiempo especificado
-        
+
         # Detener el robot
+        twist.linear.x = 0.0
+        twist.angular.z = 0.0
+        self.publisher_cmd_vel.publish(twist)
+        self.get_logger().info(f"Robot detenido")
 
 
 def main(args=None):
