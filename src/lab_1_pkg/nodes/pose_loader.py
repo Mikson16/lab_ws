@@ -5,6 +5,22 @@ from rclpy.node import Node
 from geometry_msgs.msg import Pose, PoseArray
 from tf_transformations import quaternion_from_euler
 import os
+import numpy as np
+
+def convertir_formato_valido(lista):
+    """
+    input: ["1.0", "0.2", "pi/2"]
+    output: [1.0, 0.2, 1.57...]
+    """
+    x = float(lista[0])
+    y = float(lista[1])
+    if 'pi' in lista[2]:
+        # Eliminamos los primeros 3 caracteres: p, i, /
+        # Nos quedamos con el divisor
+        theta = np.pi/float(lista[2][3:])
+    else:
+        theta = float(lista[2])
+    return x, y, theta
 
 class PoseLoader(Node):
 
@@ -36,10 +52,12 @@ class PoseLoader(Node):
                 with open(coordenadas_file_path, 'r') as file:
                     self.get_logger().info('2/3 Archivo leido')
                     for line in file:
-                        self.get_logger().info(f'linea: {line}')
-
-                        x, y, theta = map(float, line.strip().split(','))
-
+                        # Convertimos en el formato correcto
+                        line = line.replace(" ", "")
+                        x, y, theta = convertir_formato_valido(line.strip().split(','))
+                        self.get_logger().info(f'{x}, {y}, {theta}')
+                        self.get_logger().info(f' ')
+                        
                         pose = Pose()
                         pose.position.x = x
                         pose.position.y = y
