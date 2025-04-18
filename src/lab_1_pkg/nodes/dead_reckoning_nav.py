@@ -4,8 +4,6 @@ import rclpy
 from rclpy.node import Node
 # Importamos el mensaje segun el tipo que recibimos
 from geometry_msgs.msg import PoseArray, Twist
-# Importamos el mensaje para leer la odometria
-from nav_msgs.msg import Odometry
 # Ocupamos euler from quaternion para convertir el mensaje enviado
 from tf_transformations import euler_from_quaternion
 import math
