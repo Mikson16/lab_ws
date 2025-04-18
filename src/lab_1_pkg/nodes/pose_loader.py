@@ -26,20 +26,18 @@ class PoseLoader(Node):
             #Marco de coordenadas
             poses.header.frame_id = "map"
 
-            #Leer el archivo
-            #self.get_logger().info(f"Ruta completa:, {os.path.abspath(__file__)}")
-            #valor = os.path.join('coordenadas.txt')
-            #self.get_logger().info(f"{valor}")
-            #self.get_logger().info(f"Imprimiendo {dir(os.path)}")
-            #ruta = os.path('/home/maxipis/ros2_ws/src/simulation_connection/nodes/coordenadas.txt')
-
             try:
                 #! Siempre agregar el archivo de input a la ruta <workspace>/install/lib/<package>#
+                # Lo de arriba parece que no es necesario
+                # Solucion: Anadir al CMakeList el archivo .txt desde nodes para que luego al hacer symlink (una vez)
+                # se genere en el instaa/lib. Si realizamos cambios al coordenadas.txt debe ser al de src/lab...
                 dir_route = os.path.dirname(os.path.abspath(__file__)) #Consigue la ruta del directorio actual
                 coordenadas_file_path = os.path.join(dir_route, 'coordenadas.txt') #Hace join del directorio actual con el nombre del archivo
                 with open(coordenadas_file_path, 'r') as file:
                     self.get_logger().info('2/3 Archivo leido')
                     for line in file:
+                        self.get_logger().info(f'linea: {line}')
+
                         x, y, theta = map(float, line.strip().split(','))
 
                         pose = Pose()
