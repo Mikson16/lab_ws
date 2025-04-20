@@ -18,8 +18,11 @@ class NodoPublicador(Node):
         self.subscriber_key = self.create_subscription(String, 'tecla_presionada', self.recibir_tecla, 10)
         # Suscripción para detectar choques frontales
         self.create_subscription(BumperEvent, '/events/bumper', self.recibir_choque, 10)
-        # Publicador para enviar mensajes de velocidad en formato Twist
-        self.publisher_vel = self.create_publisher(Twist, '/commands/velocity', 10)
+        # Publicador para enviar mensajes de velocidad en formato Twist: Robot real
+        #self.publisher_vel = self.create_publisher(Twist, '/commands/velocity', 10)
+        # Publicador para enviar mensajes de velocidad en formato Twist: Simulacion
+        self.publisher_vel = self.create_publisher(Twist, '/cmd_vel_mux/input/navigation', 10)
+
         # Variables de estado
         self.obstaculo = False 
         self.movimiento_actual = Twist() 
@@ -55,6 +58,9 @@ class NodoPublicador(Node):
         elif tecla == "w":
             twist.linear.x = 0.2
             twist.angular.z = -1.0  # Avanza y gira der
+        elif tecla == "o":
+            twist.linear.x = 0.0
+            twist.angular.z = 0.0  # Avanza y gira der
         else:
             self.get_logger().info(f"Tecla no valida: {tecla}")
             return
@@ -74,7 +80,7 @@ class NodoPublicador(Node):
             self.obstaculo = False
 
     def enviar_velocidad(self):
-        self.get_logger().info(f'Estamos enviando: {self.movimiento_actual}')
+        #self.get_logger().info(f'Estamos enviando: {self.movimiento_actual}')
         # Publicamo el movimiento B)
         self.publisher_vel.publish(self.movimiento_actual)
 
