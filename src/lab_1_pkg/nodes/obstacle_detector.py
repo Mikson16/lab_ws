@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 
+from turtle import width
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
@@ -7,6 +8,8 @@ from geometry_msgs.msg import Vector3
 import cv2
 from cv_bridge import CvBridge
 import numpy as np
+from parametros import UMBRAL_DE_DETECCION
+from functions import get_distance
 
 
 class ObstacleDetector(Node):
@@ -32,7 +35,26 @@ class ObstacleDetector(Node):
             if msg.encoding == '16UC1':
                 self.current_cv_depth_image = self.current_cv_depth_image.astype(np.float32) / 1000.0  # Convertir a metros, en caso de que venga en milimetros
 
-            #!TODO Separar la imagen y medir la distancia entre el robot y el objeto
+            # Separar la matriz en regiones
+            height, width = self.current_cv_depth_image.shape
+            
+            izq = self.current_cv_depth_image[:, :width//3]  # Izquierda
+            centro = self.current_cv_depth_image[:, width//3:2*width//3]  # Centro
+            der = self.current_cv_depth_image[:, 2*width//3:]
+
+            #Recorrer todas las matrices y si tan solo una celda rompe el limite entonces hay un obstaculo en esa region
+            obstacle_state_izq = get_distance(izq, UMBRAL_DE_DETECCION)
+            obstacle_state_centro = get_distance(centro, UMBRAL_DE_DETECCION)
+            obstacle_state_der = get_distance(der, UMBRAL_DE_DETECCION)
+            # Crear un mensaje de ocupación
+            occupancy_state = Vector3()
+            occupancy_state.x = obstacle_state_izq
+            occupancy_state.y = obstacle_state_centro
+            occupancy_state.z = obstacle_state_der
+            
+            # Publicar el mensaje de ocupación
+            self.obstacle_pub.publish(occupancy_state)
+            self.get_logger().info(f"Obstaculo encontrado en la region izquierda: {obstacle_state_izq}, centro: {obstacle_state_centro}, derecha: {obstacle_state_der}") #TODO revisar despues para ver si cumple con lo pedido
 
         except Exception as e:
             self.get_logger().error(f'Error al obtener profundidad u obtener los datos: {e}')
