@@ -3,7 +3,7 @@
 import rclpy
 from rclpy.node import Node
 # Importamos el mensaje segun el tipo que recibimos
-from geometry_msgs.msg import PoseArray, Twist
+from geometry_msgs.msg import PoseArray, Twist, Vector3
 # Importamos el mensaje para leer la odometria
 from nav_msgs.msg import Odometry
 # Ocupamos euler from quaternion para convertir el mensaje enviado
@@ -34,8 +34,17 @@ class DeadReckoningNav(Node):
         self.publisher_cmd_vel = self.create_publisher(Twist,'/cmd_vel_mux/input/navigation',10)
 
         self.get_logger().info('Nodo dead_reckoning_nav iniciado.')
-    
 
+        # Visualizacion de obstaculos por medio del mensaje publicado por obstacle detector
+        self.subscription_obstacle = self.create_subscription(Vector3,'/ocupancy_state',self.accion_obstaculo,10)
+        self.get_logger().info('Suscrito al topico de obstaculos.')
+    
+    def accion_obstaculo(self, msg):
+        """
+        Input: msg del topico /ocupancy_state
+        Output: imprimir el estado de los obstaculos de momento
+        """
+        self.get_logger().info(f"Estado de los obstaculos: Izquierda: {msg.x}, Centro: {msg.y}, Derecha: {msg.z}")
 
     def accion_mover(self, msg):
         """

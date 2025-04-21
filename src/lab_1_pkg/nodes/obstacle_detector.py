@@ -14,14 +14,14 @@ from functions import get_distance
 
 class ObstacleDetector(Node):
     def __init__(self):
-        super()._init__('obstacle_detector')
+        super().__init__('obstacle_detector')
 
         #suscripciones
         self.depth_image_sub = self.create_subscription(Image, '/camera/depth/image_raw', self.depth_image_callback, 10)
 
         #publicaciones
         """Luego verificar bien que es lo que voy a enviar"""
-        self.obstacle_pub = self.create_publisher(Image, '/ocupancy_state', 10)
+        self.obstacle_pub = self.create_publisher(Vector3, '/ocupancy_state', 10)
 
 
         #cv_bridge
@@ -60,3 +60,15 @@ class ObstacleDetector(Node):
             self.get_logger().error(f'Error al obtener profundidad u obtener los datos: {e}')
 
 
+def main(args=None):
+    rclpy.init(args=args)
+
+    obstacle_detector = ObstacleDetector()
+
+    rclpy.spin(obstacle_detector)
+
+    # Destroy the node explicitly
+    obstacle_detector.destroy_node()
+    rclpy.shutdown()
+if __name__ == '__main__':
+    main()

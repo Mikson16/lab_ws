@@ -13,5 +13,9 @@ def generate_launch_description():
            package='lab_1_pkg',
             executable='dead_reckoning_nav.py',
             name='dead_reckoning_nav'
-        )     
-        ])
+        ),
+        Node(
+            package='lab_1_pkg',
+            executable='obstacle_detector.py',
+            name='obstacle_detector'
+        )])

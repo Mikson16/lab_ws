@@ -15,7 +15,7 @@ find_package(ament_cmake REQUIRED)
 ament_python_install_package(${PROJECT_NAME})
 
 install(PROGRAMS nodes/hello_world.py nodes/pose_loader.py
-                nodes/dead_reckoning_nav.py DESTINATION lib/${PROJECT_NAME})
+                nodes/dead_reckoning_nav.py nodes/obstacle_detector.py DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 
