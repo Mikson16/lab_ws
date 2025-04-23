@@ -43,9 +43,10 @@ class ObstacleDetector(Node):
             der = self.current_cv_depth_image[:, 2*width//3:]
 
             #Recorrer todas las matrices y si tan solo una celda rompe el limite entonces hay un obstaculo en esa region
-            obstacle_state_izq = get_distance(izq, UMBRAL_DE_DETECCION)
-            obstacle_state_centro = get_distance(centro, UMBRAL_DE_DETECCION)
-            obstacle_state_der = get_distance(der, UMBRAL_DE_DETECCION)
+            obstacle_state_izq = float(get_distance(izq, UMBRAL_DE_DETECCION))
+            obstacle_state_centro = float(get_distance(centro, UMBRAL_DE_DETECCION))
+            obstacle_state_der = float(get_distance(der, UMBRAL_DE_DETECCION))
+
             # Crear un mensaje de ocupación
             occupancy_state = Vector3()
             occupancy_state.x = obstacle_state_izq
@@ -54,7 +55,6 @@ class ObstacleDetector(Node):
             
             # Publicar el mensaje de ocupación
             self.obstacle_pub.publish(occupancy_state)
-            self.get_logger().info(f"Obstaculo encontrado en la region izquierda: {obstacle_state_izq}, centro: {obstacle_state_centro}, derecha: {obstacle_state_der}") #TODO revisar despues para ver si cumple con lo pedido
 
         except Exception as e:
             self.get_logger().error(f'Error al obtener profundidad u obtener los datos: {e}')

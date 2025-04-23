@@ -34,7 +34,11 @@ class DeadReckoningNav(Node):
         Input: msg del topico /ocupancy_state
         Output: imprimir el estado de los obstaculos de momento
         """
-        self.get_logger().info(f"Estado de los obstaculos: Izquierda: {msg.x}, Centro: {msg.y}, Derecha: {msg.z}")
+
+        self.get_logger().info(f"\nRecibido el mensaje de ocupacion: {msg}")
+
+        if msg.x > 0.0 or msg.y > 0.0 or msg.z > 0.0:
+            self.get_logger().info(f"Estado de los obstaculos: Izquierda: {msg.x}, Centro: {msg.y}, Derecha: {msg.z}")
 
     def accion_mover(self, msg):
         """
