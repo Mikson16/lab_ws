@@ -29,3 +29,5 @@ def generate_launch_description():
         dead_reckoning_nodo, 
         pose_loader_nodo])
     return launch
+        
+        

@@ -40,7 +40,7 @@ class DeadReckoningNav(Node):
             goal = [x, y, theta]
             self.get_logger().info(f" ")
 
-            self.get_logger().info(f"Moviendo al objetivo {i}: {goal}")
+            # self.get_logger().info(f"Moviendo al objetivo {i}: {goal}")
             self.mover_robot_a_destino(goal)
 
         self.get_logger().info("Todos los objetivos fueron alcanzados.")
@@ -56,8 +56,8 @@ class DeadReckoningNav(Node):
         x_goal, y_goal, theta_goal = goal
         
         if theta_goal < 0: #! Cambiar
-            self.get_logger().info("Cambiamos el signo")
-            self.get_logger().info(f"    La tupla ultima fue {self.ultima_pose}")
+            # self.get_logger().info("Cambiamos el signo")
+            # self.get_logger().info(f"    La tupla ultima fue {self.ultima_pose}")
             theta_goal = abs(theta_goal)
 
         tiempo_lineal_x = abs((x_goal - x_anterior)/VELOCIDAD_LINEAL )
@@ -68,20 +68,19 @@ class DeadReckoningNav(Node):
         self.ultima_pose = [x_goal, y_goal, abs(theta_goal)] #! Cambiar
 
         if tiempo_angular > (tiempo_lineal_y or tiempo_lineal_x):
-            self.get_logger().info("Moviendonos angularmente")
+            # self.get_logger().info("Moviendonos angularmente")
             # Significa que debemos enviar un mensaje de solo velocidad angular
             msg_to_send = [0, VELOCIDAD_ANGULAR, tiempo_angular]
         else:
-            self.get_logger().info("Moviendonos linealmente")
+            # self.get_logger().info("Moviendonos linealmente")
 
             if tiempo_lineal_x > tiempo_lineal_y:
                 msg_to_send = [VELOCIDAD_LINEAL, 0, tiempo_lineal_x]
             else:
                 msg_to_send = [VELOCIDAD_LINEAL, 0, tiempo_lineal_y]
         # Ya hasta aqui estamos en condiciones de indicarle al metodo para enviar la velocidad    
-        self.get_logger().info(f"Velocidad enviada con el tiempo {msg_to_send}")
+        # self.get_logger().info(f"Velocidad enviada con el tiempo {msg_to_send}")
         self.aplicar_velocidad(msg_to_send)
-        
 
     def aplicar_velocidad(self, msg_to_send):
         """
