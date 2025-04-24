@@ -40,7 +40,7 @@ class DeadReckoningNav(Node):
         self.subscription_obstacle = self.create_subscription(Vector3,'/ocupancy_state',self.accion_obstaculo,10)
         self.get_logger().info('Suscrito al topico de obstaculos.')
         
-        #! Esto de abajho esta bien
+        #! Esto de abajo esta bien
         # Ejecutamos el hilo
         self.hilo.start()
 
@@ -51,7 +51,7 @@ class DeadReckoningNav(Node):
         y las agrega a una queue FIFO
         """
         self.get_logger().info(f"Recibidas las posiciones")
-        
+
         for i, pose in enumerate(msg.poses):
             x = pose.position.x
             y = pose.position.y
@@ -60,8 +60,7 @@ class DeadReckoningNav(Node):
 
             goal = [x, y, theta]
             self.cola_posiciones.put(goal)
-        
-        
+
 
     def accion_mover(self):
         """
@@ -87,7 +86,7 @@ class DeadReckoningNav(Node):
         #self.get_logger().info(f"\nRecibido el mensaje de ocupacion: {msg}")
         if msg.x > 0.0 or msg.y > 0.0 or msg.z > 0.0:
             #self.get_logger().info(f"Estado de los obstaculos: Izquierda: {msg.x}, Centro: {msg.y}, Derecha: {msg.z}")
-            #self.get_logger().info(f"Obstaculos: Izquierda: {msg.x}, Centro: {msg.y}, Derecha: {msg.z}")
+            self.get_logger().info(f"Obstaculos: Izquierda: {msg.x}, Centro: {msg.y}, Derecha: {msg.z}")
             self.bandera_obstaculo = True
         elif msg.x == 0.0 and msg.y == 0.0 and msg.z == 0.0:
             self.bandera_obstaculo = False
@@ -154,7 +153,9 @@ class DeadReckoningNav(Node):
         ultimo_estado = False
         twist_blanco = Twist()
         while bandera_seguir:
-            self.get_logger().info(f"Estado bandera {self.bandera_obstaculo}")
+            if self.bandera_obstaculo == True:
+                #Hay un obstaculo
+                self.get_logger().info(f"Hay un obstaculo")
 
             if self.bandera_obstaculo == False:
                 # Si no hay obstaculos, podemos enviar la velocidad
@@ -172,7 +173,7 @@ class DeadReckoningNav(Node):
                     # Esto solo lo ejecutamos cuando pasa de no haber un obst. a haber un obst.
                     ultimo_estado = False
                     tiempo_transcurrido = time.time() - tiempo_inicio
-                    tiempo -= tiempo_transcurrido        
+                    tiempo -= tiempo_transcurrido    
         
         
         
