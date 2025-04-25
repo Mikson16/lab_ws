@@ -11,4 +11,5 @@ def get_distance(region, threshold):
                     return 1
         return 0
     except Exception as e:
+        return 0
         print(f'Error al obtener la distancia: {e}')

@@ -54,8 +54,10 @@ class ObstacleDetector(Node):
             occupancy_state.z = obstacle_state_der
             
             # Publicar el mensaje de ocupación
+            # self.get_logger().info(f'{occupancy_state}')
+
             self.obstacle_pub.publish(occupancy_state)
-            
+
 
         except Exception as e:
             self.get_logger().error(f'Error al obtener profundidad u obtener los datos: {e}')

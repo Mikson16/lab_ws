@@ -95,7 +95,6 @@ class DeadReckoningNav(Node):
             self.publisher_cmd_vel.publish(Twist())
             
             self.bandera_obstaculo = True
-            
 
         elif msg.x == 0.0 and msg.y == 0.0 and msg.z == 0.0:
             #self.get_logger().info("No hay un obstaculo")
@@ -158,33 +157,30 @@ class DeadReckoningNav(Node):
         twist.angular.x = 0.0
         twist.angular.y = 0.0
         twist.angular.z = float(w_angular)
+        self.ultimo_estado = False
+        self.bandera_seguir = True
 
-        
-        bandera_seguir = True
-        ultimo_estado = False
+
         twist_blanco = Twist()
-        while bandera_seguir:
+        while self.bandera_seguir:
             # self.get_logger().info(f"Estado bandera {self.bandera_obstaculo}")
-
             if self.bandera_obstaculo == False:
                 # Si no hay obstaculos, podemos enviar la velocidad
                 self.publisher_cmd_vel.publish(twist)
-                if ultimo_estado == False:
+                if self.ultimo_estado == False:
                     # Marcamos el tiempo de inicio
                     tiempo_inicio = time.time()
-                    ultimo_estado = True
+                    self.ultimo_estado = True
                 if time.time() - tiempo_inicio > tiempo:
-                    bandera_seguir = False
+                    self.bandera_seguir = False
             else:
                 # En el caso en que existan obstaculos, enviamos velocidad de 0
                 self.publisher_cmd_vel.publish(twist_blanco)
-                if ultimo_estado == True:
+                if self.ultimo_estado == True:
                     # Esto solo lo ejecutamos cuando pasa de no haber un obst. a haber un obst.
-                    ultimo_estado = False
+                    self.ultimo_estado = False
                     tiempo_transcurrido = time.time() - tiempo_inicio
-                    tiempo -= tiempo_transcurrido        
-
-        
+                    tiempo -= tiempo_transcurrido
         
 
 def main(args=None):
