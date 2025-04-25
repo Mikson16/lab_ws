@@ -29,6 +29,8 @@ class DeadReckoningNav(Node):
 
         # Bandera para indicar si hay un obstaculo o no
         self.bandera_obstaculo = False
+        self.bandera_seguir = True
+        self.ultimo_estado = False
         
         #Publicador de velocidades
         self.publisher_cmd_vel = self.create_publisher(Twist,'/cmd_vel_mux/input/navigation',10)
@@ -90,6 +92,12 @@ class DeadReckoningNav(Node):
             #self.get_logger().info(f"Obstaculos: Izquierda: {msg.x}, Centro: {msg.y}, Derecha: {msg.z}")
             self.bandera_obstaculo = True
             self.get_logger().info("Hay un obstaculo")
+            if msg.x > 0.0:
+                self.get_logger().info(f"Obstaculo a la izquierda")
+            if msg.y > 0.0:
+                self.get_logger().info(f"Obstaculo al frente")
+            if msg.z > 0.0:
+                self.get_logger().info(f"Obstaculo a la derecha")
 
         elif msg.x == 0.0 and msg.y == 0.0 and msg.z == 0.0:
             self.get_logger().info("No hay un obstaculo")
@@ -152,32 +160,26 @@ class DeadReckoningNav(Node):
         twist.angular.y = 0.0
         twist.angular.z = float(w_angular)
 
-        
-        bandera_seguir = True
-        ultimo_estado = False
         twist_blanco = Twist()
-        while bandera_seguir:
+        while self.bandera_seguir:
             # self.get_logger().info(f"Estado bandera {self.bandera_obstaculo}")
-
             if self.bandera_obstaculo == False:
                 # Si no hay obstaculos, podemos enviar la velocidad
                 self.publisher_cmd_vel.publish(twist)
-                if ultimo_estado == False:
+                if self.ultimo_estado == False:
                     # Marcamos el tiempo de inicio
                     tiempo_inicio = time.time()
-                    ultimo_estado = True
+                    self.ultimo_estado = True
                 if time.time() - tiempo_inicio > tiempo:
-                    bandera_seguir = False
+                    self.bandera_seguir = False
             else:
                 # En el caso en que existan obstaculos, enviamos velocidad de 0
                 self.publisher_cmd_vel.publish(twist_blanco)
-                if ultimo_estado == True:
+                if self.ultimo_estado == True:
                     # Esto solo lo ejecutamos cuando pasa de no haber un obst. a haber un obst.
-                    ultimo_estado = False
+                    self.ultimo_estado = False
                     tiempo_transcurrido = time.time() - tiempo_inicio
-                    tiempo -= tiempo_transcurrido        
-
-        
+                    tiempo -= tiempo_transcurrido
         
 
 def main(args=None):
