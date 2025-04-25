@@ -28,7 +28,7 @@ class DeadReckoningNav(Node):
         self.hilo = threading.Thread(target=self.accion_mover)
 
         # Bandera para indicar si hay un obstaculo o no
-        self.bandera_obstaculo = False
+        self.bandera_obstaculo = None
         
         #Publicador de velocidades
         self.publisher_cmd_vel = self.create_publisher(Twist,'/cmd_vel_mux/input/navigation',10)
@@ -83,17 +83,24 @@ class DeadReckoningNav(Node):
         Input: msg del topico /ocupancy_state
         Output: Cambiar el estado de la bander e imprimir 
         """
-
         #self.get_logger().info(f"\nRecibido el mensaje de ocupacion: {msg}")
         if msg.x > 0.0 or msg.y > 0.0 or msg.z > 0.0:
             #self.get_logger().info(f"Estado de los obstaculos: Izquierda: {msg.x}, Centro: {msg.y}, Derecha: {msg.z}")
-            #self.get_logger().info(f"Obstaculos: Izquierda: {msg.x}, Centro: {msg.y}, Derecha: {msg.z}")
+            if msg.x > 0.0:
+                self.get_logger().info(f"Hay un obstaculo a la izquierda")
+            if msg.y > 0.0:
+                self.get_logger().info(f"Hay un obstaculo al centro papu")
+            if msg.z > 0.0:
+                self.get_logger().info(f"Hay un obstaculo a la derecha")
+            self.publisher_cmd_vel.publish(Twist())
+            
             self.bandera_obstaculo = True
-            self.get_logger().info("Hay un obstaculo")
+            
 
         elif msg.x == 0.0 and msg.y == 0.0 and msg.z == 0.0:
-            self.get_logger().info("No hay un obstaculo")
+            #self.get_logger().info("No hay un obstaculo")
             self.bandera_obstaculo = False
+        
 
 
     def mover_robot_a_destino(self, goal):
@@ -106,7 +113,7 @@ class DeadReckoningNav(Node):
         x_anterior, y_anterior, theta_anterior = self.ultima_pose
         x_goal, y_goal, theta_goal = goal
         
-        if theta_goal < 0: #! Cambiar
+        if theta_goal < 0: 
             # self.get_logger().info("Cambiamos el signo")
             # self.get_logger().info(f"    La tupla ultima fue {self.ultima_pose}")
             theta_goal = abs(theta_goal)
@@ -116,7 +123,7 @@ class DeadReckoningNav(Node):
         tiempo_angular = abs((theta_goal - theta_anterior)/VELOCIDAD_ANGULAR) 
         
         # Actualizamos la última pose recibida
-        self.ultima_pose = [x_goal, y_goal, abs(theta_goal)] #! Cambiar
+        self.ultima_pose = [x_goal, y_goal, abs(theta_goal)] 
 
         if tiempo_angular > (tiempo_lineal_y or tiempo_lineal_x):
             # self.get_logger().info("Moviendonos angularmente")
