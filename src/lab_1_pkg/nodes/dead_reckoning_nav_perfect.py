@@ -143,9 +143,6 @@ class DeadReckoningNav(Node):
             tiempo = 1.73351206611001 # se cae a la izquierda
 
 
-            # tiempo = 1.733512066110 # se cae a la derecha 
-
-
         # Comenzamos a contar el tiempo transcurrido
         tiempo_inicio = time.time()
         while (time.time() - tiempo_inicio) < tiempo:

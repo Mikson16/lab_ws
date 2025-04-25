@@ -13,17 +13,21 @@ class OdometryReader( Node ):
         self.lista_poses = []
         self.ultima_pose = None
         self.contador = 0
+        self.bandera_ploteado = False
+
+
     
     def odometry_cb( self, odom ):
-        self.get_logger().info("Leyendo")
+        # self.get_logger().info("Leyendo")
         x = odom.pose.pose.position.x
         y = odom.pose.pose.position.y
         self.contador +=1
-        self.get_logger().info(f"Contando {self.contador}")
+        # self.get_logger().info(f"Contando {self.contador}")
 
         info = [x,y]
-        self.get_logger().info(f'Pose actual {info}') 
-        if self.contador > 150:
+        # self.get_logger().info(f'Pose actual {info}') 
+        if self.contador > 150 and self.bandera_ploteado == False:
+            self.bandera_ploteado = True
             # Si registramos la misma pose, terminamos de avanzar
             self.graficar() 
             pass

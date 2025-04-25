@@ -50,7 +50,7 @@ class DeadReckoningNav(Node):
         Este método recibe la lista de posiciones que envia pose_loader
         y las agrega a una queue FIFO
         """
-        self.get_logger().info(f"Recibidas las posiciones")
+        # self.get_logger().info(f"Recibidas las posiciones")
         
         for i, pose in enumerate(msg.poses):
             x = pose.position.x
@@ -89,7 +89,10 @@ class DeadReckoningNav(Node):
             #self.get_logger().info(f"Estado de los obstaculos: Izquierda: {msg.x}, Centro: {msg.y}, Derecha: {msg.z}")
             #self.get_logger().info(f"Obstaculos: Izquierda: {msg.x}, Centro: {msg.y}, Derecha: {msg.z}")
             self.bandera_obstaculo = True
+            self.get_logger().info("Hay un obstaculo")
+
         elif msg.x == 0.0 and msg.y == 0.0 and msg.z == 0.0:
+            self.get_logger().info("No hay un obstaculo")
             self.bandera_obstaculo = False
 
 
@@ -154,7 +157,7 @@ class DeadReckoningNav(Node):
         ultimo_estado = False
         twist_blanco = Twist()
         while bandera_seguir:
-            self.get_logger().info(f"Estado bandera {self.bandera_obstaculo}")
+            # self.get_logger().info(f"Estado bandera {self.bandera_obstaculo}")
 
             if self.bandera_obstaculo == False:
                 # Si no hay obstaculos, podemos enviar la velocidad
@@ -173,7 +176,7 @@ class DeadReckoningNav(Node):
                     ultimo_estado = False
                     tiempo_transcurrido = time.time() - tiempo_inicio
                     tiempo -= tiempo_transcurrido        
-        
+
         
         
 

@@ -38,12 +38,12 @@ class DeadReckoningNav(Node):
             _, _, theta = euler_from_quaternion((q.x, q.y, q.z, q.w))
 
             goal = [x, y, theta]
-            self.get_logger().info(f" ")
+            # self.get_logger().info(f" ")
 
             # self.get_logger().info(f"Moviendo al objetivo {i}: {goal}")
             self.mover_robot_a_destino(goal)
 
-        self.get_logger().info("Todos los objetivos fueron alcanzados.")
+        # self.get_logger().info("Todos los objetivos fueron alcanzados.")
 
     def mover_robot_a_destino(self, goal):
         """
@@ -68,7 +68,7 @@ class DeadReckoningNav(Node):
         self.ultima_pose = [x_goal, y_goal, abs(theta_goal)] #! Cambiar
 
         if tiempo_angular > (tiempo_lineal_y or tiempo_lineal_x):
-            # self.get_logger().info("Moviendonos angularmente")
+            self.get_logger().info(f"Moviendonos angularmente {tiempo_angular}")
             # Significa que debemos enviar un mensaje de solo velocidad angular
             msg_to_send = [0, VELOCIDAD_ANGULAR, tiempo_angular]
         else:

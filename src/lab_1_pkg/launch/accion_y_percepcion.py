@@ -15,17 +15,24 @@ def generate_launch_description():
                                                      'launch/run_all.xml')
     
     # Cargamos nuestros nodos
-    dead_reckoning_nodo = Node(package='lab_1_pkg',
+    pose_loader_nodo = Node(package='lab_1_pkg',
                                executable='pose_loader.py',
                                name='pose_loader')
-    pose_loader_nodo = Node(
+    dead_reckoning_nodo = Node(
            package='lab_1_pkg',
-            executable='dead_reckoning_nav.py',
+            executable='dead_reckoning_nav_obstacle.py',
             name='dead_reckoning_nav'
+        )  
+
+    kinect_nodo = Node(
+           package='lab_1_pkg',
+            executable= 'obstacle_detector.py',
+            name='obstacle'
         )    
     # Retornamos el archivo de tipo launch
     launch = LaunchDescription([
         IncludeLaunchDescription(XMLLaunchDescriptionSource(simulacion_launch)),
         dead_reckoning_nodo, 
+        kinect_nodo,
         pose_loader_nodo])
     return launch
