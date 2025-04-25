@@ -14,8 +14,8 @@ find_package(ament_cmake REQUIRED)
 
 ament_python_install_package(${PROJECT_NAME})
 
-install(PROGRAMS nodes/nodo_graficador_perfect.py nodes/pose_loader.py nodes/dead_reckoning_nav_perfect.py
-                nodes/dead_reckoning_nav.py nodes/dead_reckoning_nav_obstacle.py nodes/obstacle_detector.py DESTINATION lib/${PROJECT_NAME})
+install(PROGRAMS nodes/nodo_graficador_perfect.py nodes/pose_loader.py  nodes/coordenadas.txt nodes/dead_reckoning_nav_perfect.py nodes/dead_reckoning_nav.py nodes/dead_reckoning_nav_obstacle.py 
+                 nodes/obstacle_detector.py nodes/nodo_graficador.py nodes/publisher_vel.py nodes/key_manager.py DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 
